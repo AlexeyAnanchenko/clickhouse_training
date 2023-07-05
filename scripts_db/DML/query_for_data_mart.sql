@@ -1,21 +1,21 @@
 WITH
 	sales_total AS (
 		SELECT product_id, sales_date, sales_cnt,
-			   (SELECT shop_id FROM shop WHERE shop_name = 'DNS') AS shop_id
+		       (SELECT shop_id FROM shop WHERE shop_name = 'DNS') AS shop_id
 		FROM shop_dns
 		UNION DISTINCT SELECT product_id, sales_date, sales_cnt,
-			  		   		  (SELECT shop_id FROM shop WHERE shop_name = 'М.Видео') AS shop_id
-					   FROM shop_mvideo
+			  	      (SELECT shop_id FROM shop WHERE shop_name = 'М.Видео') AS shop_id
+			       FROM shop_mvideo
 		UNION DISTINCT SELECT product_id, sales_date, sales_cnt,
-							  (SELECT shop_id FROM shop WHERE shop_name = 'Ситилинк') AS shop_id
-					   FROM shop_citilink
+				      (SELECT shop_id FROM shop WHERE shop_name = 'Ситилинк') AS shop_id
+			       FROM shop_citilink
 	),
 	sales AS (
 		SELECT s.shop_id, s.product_id, s.last_date_of_month, SUM(s.sales_cnt) AS sales_of_month
 		FROM (
 		      SELECT shop_id, product_id, sales_cnt, 
-			   		 (date_trunc('month', sales_date) + INTERVAL 1 MONTH - INTERVAL 1 DAY) AS last_date_of_month
-			  FROM sales_total
+			     (date_trunc('month', sales_date) + INTERVAL 1 MONTH - INTERVAL 1 DAY) AS last_date_of_month
+		      FROM sales_total
 		) AS s
 		GROUP BY shop_id, product_id, last_date_of_month
 		ORDER BY shop_id, product_id
